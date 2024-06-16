@@ -15,7 +15,7 @@ build:
 	rm main.o
 	rm main.elf 
 
-flash:
+flash: build
 	avrdude -c arduino -p ${DEVICE} -P /dev/ttyUSB0 -b 57600 -U flash:w:main.hex
 
 
