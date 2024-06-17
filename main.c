@@ -13,88 +13,104 @@
  * 
  */
 
-void toggleEnable(){
-    // enable
-    DDRB &= ~(0b1 << 3);
-    _delay_ms(1); 
-    DDRB |= (0b1 << 3);
-    _delay_ms(1);
-    // disable
-    DDRB &= ~(0b1 << 3);
-    _delay_ms(100); 
-}
+void send4(uint8_t data){
 
-void send4(uint8_t rs, uint8_t data){
-    if(rs == 1){
-        PORTB |= (0b1 << 4);
+    PORTD = 0;
+    for (int i = 0; i < 4; i++) {
+        PORTD |= (((data >> i) & 0x01) << i) << 4; 
     }
 
-    PORTD |= (data << 2) | 0b11000011; 
+    _delay_us(100); 
 
-    toggleEnable(); 
-
-    PORTB &= ~(0b1 << 4);
-    _delay_ms(100);
+    // enable
+    PORTB &= ~(1<<PB3);
+    _delay_us(1); 
+    PORTB |= (1<<PB3);
+    _delay_us(1);
+    // disable
+    PORTB &= ~(1<<PB3);
+    _delay_us(100); 
 }
 
 void begin(){
      // set pins 12, 11 to output
-    DDRB |= 0b00011000;
+    DDRB |= (1<<DDB4) | (1<<DDB3);
     // set pins 5-2 to output
-    DDRD |= 0b00111100;
+    DDRD |= (1<<DDD2) | (1<<DDD3) | (1<<DDD4) | (1<<DDD5);
 
-    _delay_ms(500); 
+    _delay_us(50000);
+
+    // set 12, 11 to low
+    PORTB &= ~((1<<PB4) | (1<<PB3)); 
     
-    send4(0, 0b0011); 
-    _delay_ms(5);
-    send4(0, 0b0011); 
-    _delay_ms(5); 
-    send4(0, 0b0011); 
+    // try to set 4 bit mode x3
+    send4(0b0011); 
+    _delay_us(4500);
 
-    send4(0, 0b0010); // set interface to be 4 bits long
+    send4(0b0011); 
+    _delay_us(4500); 
+
+    send4(0b0011); 
+    _delay_us(150); 
+
+    send4(0b0010); // set interface to be 4 bits long
     
-    send4(0, 0b0010); // function set (display lines and char font)
-    send4(0, 0b1000);  // 0000? NF**
+    send4(0b0010); // function set (display lines and char font)
+    send4(0b1000);  // 0000? NF**
 
-    send4(0, 0b0000); // display off
-    send4(0, 0b1000); 
+    send4(0b0000); // display off
+    send4(0b1100);  // 1000
 
-    send4(0, 0b0000); // display clear
-    send4(0, 0b0001); 
+    send4(0b0000); // display clear
+    send4(0b0001); 
+    _delay_us(2000); 
 
-    send4(0, 0b0000); // entry mode set
-    send4(0, 0b0110); // I/D S
+    send4(0b0000); // entry mode set
+    send4(0b0110); // I/D S
 
 }
 
-void transfer(bool datareg, uint8_t data){
+void command(uint8_t rs, uint8_t instruction){
+    // wipe previous
+    PORTB &= ~(1<<PB4); 
+    // write new
+    PORTB |= ((rs && 1)<<PB4);
 
-    send4(datareg, data >> 4);
-
-    send4(datareg, data & 0b00001111);
-
-    _delay_ms(2); 
+    send4(instruction >> 4);
+    send4(instruction); 
 }
 
 int main(){
     _delay_ms(100); 
 
     // set pin 13 to output
-    DDRB |= 0b00100000;
     
     begin();
 
-   // transfer(1, 0b00000011);
+    // command(0, 0b00010100); // shift cursor right 
+
+    // command(1, 0b00000011); // write 0
+
+    // command(0, 0b00001011); // cursor and blinking 
+
+    _delay_ms(10); 
+
+    DDRB |= 0b00100000;
+
+    PORTB |= 0b00100000; 
+
+    // DDRB |= (1<<DDB4); 
     
     while(1){
+
         
-        PORTB |= 0b00100000;
+        // PORTB |= (1<<PORTB4);
 
-        _delay_ms(100);
+        // _delay_ms(100);
 
-        PORTB &= 0b11011111;
+        // PORTB &= ~(1<<PORTB4);
 
-        _delay_ms(100); 
+        // _delay_ms(100); 
 
     }
 
