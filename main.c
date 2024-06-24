@@ -2,6 +2,11 @@
 #include <util/delay.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include "i2c.h"
+
+#include "BME68x_SensorAPI/bme68x.h"
+#include "BME68x_SensorAPI/bme68x_defs.h"
+
 
 #include "lcd.h"
 
@@ -15,6 +20,11 @@
  * 
  */
 
+void delay_us_mask(uint32_t period, void *intf_ptr){
+    TCNT1 = 0x100; // 16 bit write on 8 bit bus 1 signifies bottom bits
+    TCNT1 = 0x000;
+
+}
 
 int main(){
     _delay_ms(100); 
@@ -24,6 +34,12 @@ int main(){
     lcd_begin();
 
     lcd_write("Hello Dude!");
+
+    struct bme68x_dev bme_interface;
+
+    bme_interface.read = &i2c_read;
+    bme_interface.write = &i2c_write;
+    bme_interface.delay_us = &delay_us_mask; 
 
     _delay_ms(10); 
 
