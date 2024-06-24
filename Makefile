@@ -17,6 +17,3 @@ build:
 
 flash: build
 	avrdude -c arduino -p ${DEVICE} -P /dev/ttyUSB0 -b 57600 -U flash:w:main.hex || avrdude -c arduino -p ${DEVICE} -P /dev/ttyUSB1 -b 57600 -U flash:w:main.hex 
-
-
-

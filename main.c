@@ -13,12 +13,32 @@
  * 
  */
 
-void send4(uint8_t data){
-
-    PORTD = 0;
+void send4Prep(uint8_t data){
+    PORTD &= 0b11000011;
     for (int i = 0; i < 4; i++) {
         PORTD |= (((data >> i) & 0x01) << i) << 4; 
     }
+
+    _delay_us(100); 
+
+    // enable
+    PORTB &= ~(1<<PB3);
+    _delay_us(1); 
+    PORTB |= (1<<PB3);
+    _delay_us(1);
+    // disable
+    PORTB &= ~(1<<PB3);
+    _delay_us(100); 
+}
+
+void send4(uint8_t data){
+
+    PORTD &= 0b11000011; 
+
+    for(int i = 0; i < 4; i++){
+        PORTD |= (((data >> i) & 0x1) << (3-i)) << 2; 
+    }
+
 
     _delay_us(100); 
 
@@ -44,29 +64,29 @@ void begin(){
     PORTB &= ~((1<<PB4) | (1<<PB3)); 
     
     // try to set 4 bit mode x3
-    send4(0b0011); 
+    send4Prep(0b0011); 
     _delay_us(4500);
 
-    send4(0b0011); 
+    send4Prep(0b0011); 
     _delay_us(4500); 
 
-    send4(0b0011); 
+    send4Prep(0b0011); 
     _delay_us(150); 
 
-    send4(0b0010); // set interface to be 4 bits long
+    send4Prep(0b0010); // set interface to be 4 bits long
     
-    send4(0b0010); // function set (display lines and char font)
-    send4(0b1000);  // 0000? NF**
+    send4Prep(0b0010); // function set (display lines and char font)
+    send4Prep(0b1000);  // 0000? NF**
 
-    send4(0b0000); // display off
-    send4(0b1100);  // 1000
+    send4Prep(0b0000); // display off
+    send4Prep(0b1100);  // 1000
 
-    send4(0b0000); // display clear
-    send4(0b0001); 
+    send4Prep(0b0000); // display clear
+    send4Prep(0b0001); 
     _delay_us(2000); 
 
-    send4(0b0000); // entry mode set
-    send4(0b0110); // I/D S
+    send4Prep(0b0000); // entry mode set
+    send4Prep(0b0110); // I/D S
 
     _delay_ms(100); 
 
@@ -81,6 +101,12 @@ void command(uint8_t rs, uint8_t instruction){
     send4(instruction >> 4);
     send4(instruction); 
     _delay_ms(10); 
+}
+
+void write(char * str, uint8_t len){
+    for(int i = 0; i < len; i++){
+        command(1, str[i]);
+    }
 }
 
 
@@ -105,26 +131,13 @@ int main(){
     
     begin();
 
-    // 0x20 is ' '
-    // '0' is '0'
-    // '2' is '1'
-    // '1' is '2'
-
-    command(1, '0');
-    command(1, 0b00010000); 
-    command(1, 0b00110001); 
-
-
-
-    _delay_ms(1000); 
-
-    // command(0, 0b00011100);
+    write("Hello world", 11);
 
     _delay_ms(10); 
 
-    DDRB |= 0b00100000;
+    // DDRB |= 0b00100000;
 
-    PORTB |= 0b00100000; 
+    // PORTB |= 0b00100000; 
 
     // DDRB |= (1<<DDB4); 
     
