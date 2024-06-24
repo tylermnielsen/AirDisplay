@@ -68,6 +68,8 @@ void begin(){
     send4(0b0000); // entry mode set
     send4(0b0110); // I/D S
 
+    _delay_ms(100); 
+
 }
 
 void command(uint8_t rs, uint8_t instruction){
@@ -78,7 +80,23 @@ void command(uint8_t rs, uint8_t instruction){
 
     send4(instruction >> 4);
     send4(instruction); 
+    _delay_ms(10); 
 }
+
+
+// void write_c(char c){
+
+//     switch (c) {
+//         case 'H':
+//             command(1, 0b01001000);
+//             break;
+//         case 'I':
+//             command(1, 0b01001001);
+//             break;
+//         case 't':
+//             command(1, 0b01000000); 
+//     }
+// }
 
 int main(){
     _delay_ms(100); 
@@ -87,11 +105,20 @@ int main(){
     
     begin();
 
-    // command(0, 0b00010100); // shift cursor right 
+    // 0x20 is ' '
+    // '0' is '0'
+    // '2' is '1'
+    // '1' is '2'
 
-    // command(1, 0b00000011); // write 0
+    command(1, '0');
+    command(1, 0b00010000); 
+    command(1, 0b00110001); 
 
-    // command(0, 0b00001011); // cursor and blinking 
+
+
+    _delay_ms(1000); 
+
+    // command(0, 0b00011100);
 
     _delay_ms(10); 
 
@@ -103,7 +130,6 @@ int main(){
     
     while(1){
 
-        
         // PORTB |= (1<<PORTB4);
 
         // _delay_ms(100);
