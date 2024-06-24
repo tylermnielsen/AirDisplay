@@ -12,7 +12,7 @@ build:
 	avr-gcc -Wall -Os -DF_CPU=${CLOCK} -mmcu=${DEVICE} -c main.c lcd.c
 	avr-gcc -Wall -DF_CPU=${CLOCK} -mmcu=${DEVICE} -o main.elf main.o lcd.o
 	avr-objcopy -O ihex main.elf main.hex
-	rm main.o
+	rm main.o lcd.o
 	rm main.elf 
 
 flash: build
