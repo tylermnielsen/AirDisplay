@@ -131,7 +131,11 @@ int main(){
     
     begin();
 
-    write("Hello world", 11);
+    write("Hello wo", 11);
+
+    command(0, 0b10000000 | 0x40); //0x40
+
+    write("rld!", 4); 
 
     _delay_ms(10); 
 
