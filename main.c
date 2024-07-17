@@ -20,10 +20,15 @@
  * 
  */
 
-void delay_us_mask(uint32_t period, void *intf_ptr){
-    TCNT1 = 0x100; // 16 bit write on 8 bit bus 1 signifies bottom bits
-    TCNT1 = 0x000;
+volatile bool overflowed = 0; 
+void timer_overflow(){ 
+    overflowed = 1;
+}
 
+void delay_us_mask(uint32_t period, void *intf_ptr){
+    for(uint32_t i = 0; i < period; i++){
+        _delay_us(1); 
+    }
 }
 
 int main(){
