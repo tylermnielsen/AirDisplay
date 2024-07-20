@@ -42,6 +42,7 @@ int main(){
 
     struct bme68x_dev bme_interface;
 
+    bme_interface.chip_id = 
     bme_interface.read = &i2c_read;
     bme_interface.write = &i2c_write;
     bme_interface.delay_us = &delay_us_mask; 
