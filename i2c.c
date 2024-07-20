@@ -6,7 +6,7 @@
  */
 
 int8_t i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr){
-
+    
 
     return 0; 
 }

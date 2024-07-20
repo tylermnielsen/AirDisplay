@@ -8,8 +8,8 @@ CLOCK      = 9830400
 
 # FUSES      = -U hfuse:w:0xd9:m -U lfuse:w:0xe0:m
 
-SRCS = main.c lcd.c i2c.c BME68x_SensorAPI/bme68x.c
-OBJS = main.o lcd.o i2c.o bme68x.o
+SRCS = main.c lcd.c i2c.c BME68x_SensorAPI/bme68x.c uart.c
+OBJS = main.o lcd.o i2c.o bme68x.o uart.o
 
 build:
 	avr-gcc -Wall -Os -DF_CPU=${CLOCK} -mmcu=${DEVICE} -c ${SRCS}
