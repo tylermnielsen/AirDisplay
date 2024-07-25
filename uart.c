@@ -1,10 +1,10 @@
 #include "uart.h"
 #include <avr/io.h>
 
-void uart_begin(uint32_t ubrr){
+void uart_begin(){
     // set baud rate
-    UBRR0H = (unsigned char)(ubrr>>8);
-    UBRR0H = (unsigned char)ubrr; 
+    UBRR0H = (unsigned char)(MYUBRR>>8);
+    UBRR0L = (unsigned char)MYUBRR; 
    
     // set format: 8 data 1 stop bit
     UCSR0B = (3<<UCSZ00);
