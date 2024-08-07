@@ -36,16 +36,16 @@ int main(){
     _delay_ms(100); 
 
     
-    // lcd_begin();
+    lcd_begin();
 
-    // lcd_write("Hello Dude!");
+    lcd_write("Starting...");
 
-    // struct bme68x_dev bme_interface;
+    struct bme68x_dev bme_interface;
 
-    // bme_interface.chip_id = 
-    // bme_interface.read = &i2c_read;
-    // bme_interface.write = &i2c_write;
-    // bme_interface.delay_us = &delay_us_mask; 
+    bme_interface.chip_id = 
+    bme_interface.read = &i2c_read;
+    bme_interface.write = &i2c_write;
+    bme_interface.delay_us = &delay_us_mask; 
 
 
     uart_begin(); // begin uart and set baud to 9600
@@ -57,15 +57,11 @@ int main(){
     DDRB |= (1<<DDB5); 
     
     while(1){
-        uart_send_c('h');
-		uart_send_c('i');
-		uart_send_c('\n'); 
 
-		uart_send_s("Hello\n"); 
+		
 
-		char buf[10];
-
-		uart_receive_s(buf, 10);
+		// uart_receive_s(buf, 10);
+		// uart_send_s(buf);
 
         PORTB |= (1<<PORTB5);
 
