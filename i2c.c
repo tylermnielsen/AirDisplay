@@ -26,7 +26,7 @@ int8_t i2c_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf
 
     while(!(TWCR & (1<<TWINT))); 
 
-    if(!(TWSR & 0xF8) != READ_MT_SLA_ACK) return 1; 
+    if(!(TWSR & 0xF8) != READ_SLA_ACK) return 1; 
 
 
 
