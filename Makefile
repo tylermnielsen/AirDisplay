@@ -24,10 +24,3 @@ flash: build
 clean:
 	rm ${OBJS}
 	rm main.elf
-
-buildTWITest:
-	avr-gcc -Wall -Os -DF_CPU=14745600 -mmcu=${DEVICE} -c twitest.c
-	avr-gcc -Wall -DF_CPU=14745600UL -mmcu=${DEVICE} -o main.elf twitest.o
-	avr-objcopy -O ihex main.elf main.hex
-	avrdude -c arduino -p ${DEVICE} -P /dev/ttyUSB0 -b 57600 -U flash:w:main.hex || avrdude -c arduino -p ${DEVICE} -P /dev/ttyUSB1 -b 57600 -U flash:w:main.hex 
-

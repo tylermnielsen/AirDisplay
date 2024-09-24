@@ -9,10 +9,11 @@
 #include "BME68x_SensorAPI/bme68x.h"
 #include "BME68x_SensorAPI/bme68x_defs.h"
 
-
 #include "lcd.h"
 
 #define LED_BUILTIN 13
+
+#define BME_ADDR 0x77
 
 /**
  * D12 (PB4) is RS (register select)
@@ -69,22 +70,32 @@ int main(){
     // PORTB |= 0b00100000; 
 
     DDRB |= (1<<DDB5); 
+    uart_send_s("Start I2C\n");
+
+    uint8_t data = 0xD0; 
+    i2c_write(BME_ADDR, &data, 1, NULL); 
+
+    i2c_read(BME_ADDR, &data, 1, NULL); 
+
+    char str[10]; 
+    sprintf(str, "%x", data); 
+    uart_send_s(str); 
     
     while(1){
-		uart_send_c('\n');
-		delay_ms(1000); 
+		// uart_send_c('\n');
+		// delay_ms(1000); 
 		
 
 		// uart_receive_s(buf, 10);
 		// uart_send_s(buf);
 
-        // PORTB |= (1<<PORTB5);
+        PORTB |= (1<<PORTB5);
 
-        // _delay_ms(500);
+        _delay_ms(500);
 
-        // PORTB &= ~(1<<PORTB5);
+        PORTB &= ~(1<<PORTB5);
 
-        // _delay_ms(500); 
+        _delay_ms(500); 
 
     }
 
