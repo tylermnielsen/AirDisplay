@@ -2,9 +2,9 @@
 #include <util/delay.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include "i2c.h"
 #include "uart.h"
 #include <stdio.h>
+#include <Wire>
 
 #include "BME68x_SensorAPI/bme68x.h"
 #include "BME68x_SensorAPI/bme68x_defs.h"
