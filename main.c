@@ -4,14 +4,16 @@
 #include <stdint.h>
 #include "i2c.h"
 #include "uart.h"
+#include <stdio.h>
 
 #include "BME68x_SensorAPI/bme68x.h"
 #include "BME68x_SensorAPI/bme68x_defs.h"
 
-
 #include "lcd.h"
 
 #define LED_BUILTIN 13
+
+#define BME_ADDR 0x77
 
 /**
  * D12 (PB4) is RS (register select)
@@ -21,15 +23,27 @@
  * 
  */
 
-volatile bool overflowed = 0; 
-void timer_overflow(){ 
-    overflowed = 1;
+// T = (MOD + 1)/(Fclk / ps)
+// MOD = T * (Fclk / ps) - 1
+void delay_ms(uint16_t period){
+	PRR &= ~(1<<3); // make sure Timer 1 is enabled
+
+	TCNT1 = 0x00; // start at 0
+	//          * 9            * .5         *.125 (approximate .1)
+	OCR1A = (period * 9) + (period >> 1) + (period >> 3) - 1; // set compare A
+	char out[10];
+	sprintf(out, "%u\n", OCR1A);
+	uart_send_s(out); 
+
+	TIFR1 |= (1 << OCF1A); // clear compare A flag
+	TCCR1B |= (1 << CS12) | (1 << CS10); // turn on timer w/ prescaler 1024
+
+	while((TIFR1 & (1 << OCF1A)) == false); // wait for compare A flag to be set
+	TCCR1B &= ~((1 << CS12) | (1 << CS11) | (1 << CS10));  // turn off timer
 }
 
-void delay_us_mask(uint32_t period, void *intf_ptr){
-    for(uint32_t i = 0; i < period; i++){
-        _delay_us(1); 
-    }
+void delay_us(uint32_t period, void *intf_ptr){
+    TCCR1B = (TCCR1B & ~(0b111)) | 0b001; 
 }
 
 int main(){
@@ -38,16 +52,16 @@ int main(){
     
     lcd_begin();
 
-    lcd_write("Starting...");
+	char o[15];
+	sprintf(o, "%lu", F_CPU);
+	lcd_write(o);
 
-    struct bme68x_dev bme_interface;
+    // struct bme68x_dev bme_interface;
 
-    bme_interface.chip_id = BME68X_CHIP_ID;
-    bme_interface.read = &i2c_read;
-    bme_interface.write = &i2c_write;
-    bme_interface.delay_us = &delay_us_mask; 
-
-    
+    // bme_interface.chip_id = BME68X_CHIP_ID;
+    // bme_interface.read = &i2c_read;
+    // bme_interface.write = &i2c_write;
+    // bme_interface.delay_us = &delay_us_mask; 
 
     uart_begin(); // begin uart and set baud to 9600
 
@@ -56,9 +70,20 @@ int main(){
     // PORTB |= 0b00100000; 
 
     DDRB |= (1<<DDB5); 
+    uart_send_s("Start I2C\n");
+
+    uint8_t data = 0xD0; 
+    i2c_write(BME_ADDR, &data, 1, NULL); 
+
+    i2c_read(BME_ADDR, &data, 1, NULL); 
+
+    char str[10]; 
+    sprintf(str, "%x", data); 
+    uart_send_s(str); 
     
     while(1){
-
+		// uart_send_c('\n');
+		// delay_ms(1000); 
 		
 
 		// uart_receive_s(buf, 10);
